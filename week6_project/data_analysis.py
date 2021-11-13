@@ -67,13 +67,14 @@ class Data_view(Data_analyze):
 
     def time_view(self):
         time_list = self.time_list
-        time_data_list = self.time_analyze('Beijing','Total')
-        #print(time_data_list)
-        plt.figure(figsize=(20,6.5))
-        plt.bar(range(len(time_list)),time_data_list,tick_label = time_list,color = 'violet')
-        plt.xlabel('年份')
-        plt.ylabel('Beijing Co2 排放量')
-        plt.show()
+        for i in self.province_list:
+            time_data_list = self.time_analyze(i,'Total')
+            #print(time_data_list)
+            plt.figure(figsize=(20,6.5))
+            plt.bar(range(len(time_list)),time_data_list,tick_label = time_list,color = 'violet')
+            plt.xlabel('年份')
+            plt.ylabel(i+' Co2 排放量')
+            plt.savefig('figure/'+i+'_total.png')
 
     def space_view(self):
         province_list = self.province_list
@@ -96,7 +97,7 @@ class NotnumError(ValueError):
         self.province = province
         self.industry = industry
         self.type = type
-        self.message = f"the data of{province} in {year} has nan "
+        self.message = f"the data of {province} in {year} has nan about {industry} and the type is {type}"
 
 class NotnumberTest(Data_analyze):
     def __init__(self,path_list):
@@ -114,47 +115,96 @@ class NotnumberTest(Data_analyze):
                     df_temp = doc_list[y][sheet]
                     row_index = list(df_temp[df_temp.columns[0]])
                     col_index = list(df_temp.columns)
+                    #print(col_index)
                     values = df_temp.values
-                    
-                    print(sheet)
-                    break
-            break
-        '''
-        self._industry = industry
-        self._type = type'''
-
-        print(len(doc_list))
+                    for industry_index in range(2,len(row_index)):
+                        if not pd.isnull(row_index[industry_index]):
+                            self._industry = row_index[industry_index]
+                            for type_index in range(1,len(col_index)-3):
+                                if not pd.isnull(col_index[type_index]):
+                                    self._type = col_index[type_index]
+                                    if pd.isnull(values[industry_index][type_index]):
+                                        raise NotnumError(self._year,self._province,self._industry,self._type)
+                                    else:
+                                        continue
+                    #print(sheet)
+        #print(len(doc_list))
     
 
 # 4. 由于部分省份排放总量数据为0，要求在计算比例时进行检验，若检验发现总量为0，
 # 则抛出ZeroDivisionError，并打印对应的行名等信息。
 
+class Zero_test(Data_analyze):
+    def __init__(self, path_list):
+        super().__init__(path_list)
+
+    def zero_test(self):
+        doc_list = self.df_list
+        year_list = self.time_list
+        province_list = self.province_list
+        for y in range(len(doc_list)):
+            self._year = year_list[y]
+            df_year = doc_list[year_list.index(self._year)]['Sum']
+            col_index = list(df_year.columns)
+            values = df_year.values
+            #print(col_index)
+            for i in range(len(province_list)):
+                self._province = province_list[i]
+                for j in range(1,len(col_index)):
+                    self._type = col_index[j]
+                    if values[i][j] == 0:
+                        #print(f"the total data of {self._province} has a zero in {self._year} and the type is {self._type}.")
+                        raise ZeroDivisionError
+                    else:
+                        pass
+
+                    
 
 # 5. （附加）按时间分析时，注意观察不同区域随时间排放量的变化，
 # 是否存在一些明显的趋势，以及趋势的空间差异，并思考这些趋势及差异的管理意义与政策启发。
 
+
+# 附加题放到word中
+
 def main():
     path_list = os.listdir('co2_demo')
     path_list = sorted(path_list)
-    #print(path_list)
+    print(path_list)
 
-    #Data = Data_analyze(path_list)
+    Data = Data_analyze(path_list)
+
+    Data.time_analyze('Beijing','Total')
 
 
-    #Data.time_analyze('Beijing','Total')
-    #print(Data.time_list)
+    print(Data.time_list)
     #print(Data.df_list)
 
 
-    #Data.space_analyze('1997','Total')
+    Data.space_analyze('1997','Total')
 
 
-    #Data_draw = Data_view(path_list)
+    Data_draw = Data_view(path_list)
 
-    #ata_draw.time_view()
-    #Data_draw.space_view()
+    #Data_draw.time_view()
+    Data_draw.space_view()
 
     Text = NotnumberTest(path_list)
-    Text.read_data()
+    
+
+    try:
+        Text.read_data()
+    except NotnumError as Nn:
+        print(Nn.message)
+    else:
+        print('There is no nan in data.')
+
+
+    Zero = Zero_test(path_list)
+    try:
+        Zero.zero_test()
+    except ZeroDivisionError as ZD:
+        print(f"the total data of {Zero._province} has a zero in {Zero._year} and the type is {Zero._type}.")
+    else:
+        print("There is no zero in data")
 
 main()
