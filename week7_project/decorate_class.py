@@ -122,15 +122,6 @@ def main():
 
     #mem_space(100000)
 
-    '''Prime_test = Prime(1000000)
-    lp = LineProfiler()
-    lp_wrapper = lp(Prime.prime_test)
-    num_prime = lp_wrapper(Prime_test)
-    print("---------------------------------------")
-    print(f"There is {num_prime} prime in it")
-    print("---------------------------------------")
-    lp.print_stats()'''
-
     #test_prime(10000)
 
     #save('/Users/xihe/Documents/python_mp2021_project/week7_project/zero')
