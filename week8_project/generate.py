@@ -81,15 +81,16 @@ class FaceDataset:
         
 
 def main():
-    '''print("hello")
+    print("hello")
     generate_vector = random_walk(3,10,10,5)
     merge_vector = merge_random_walk(generate_vector)
-    print(merge_vector)'''
+    print(merge_vector)
 
     path = '/Users/xihe/Documents/python_mp2021_project/week8_project/originalPics'
     Image_class = FaceDataset(path)
     for i in Image_class:
     #for i in range(1):
         image_array = Image_class.image_process()
+        #print(image_array)
     #print(next(Image_class.path_generate))
 main()

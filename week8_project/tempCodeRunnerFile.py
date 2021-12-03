@@ -1,0 +1,1 @@
+name = path_init.split('/')[-1]
