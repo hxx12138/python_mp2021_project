@@ -98,7 +98,7 @@ class TextPlotter(Plotter):
         plt.imshow(wc)
         plt.axis('off')
         plt.show()
-        #wc.to_file('词云.png')
+        wc.to_file('词云.png')
 
 # 5. 实现类ImagePlotter，实现图片型数据的绘制，即输入数据为图片的路径或者图片内容（可以是多张图片），呈现图片并按某种布局组织（如2x2等)。
 
