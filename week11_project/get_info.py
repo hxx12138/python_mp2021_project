@@ -27,8 +27,9 @@ def main():
         url = path+id_list[i]
         response = requests.session().get(url=url,headers=headers)
         html = response.content.decode('utf-8')
-        soup = BeautifulSoup(html, 'html.parser')
+        soup = BeautifulSoup(html, 'html.parser')、
 
+        # 图片下载
         '''img_info = soup.find('div',class_='cover u-cover u-cover-dj')
         img_url = img_info.find('img',class_='j-img')['data-src']
         img_id = id_list[i][-10:]
@@ -36,6 +37,7 @@ def main():
         #download_img(img_id,img_url)
         print(img_url)'''
 
+        # 
         
 
 
