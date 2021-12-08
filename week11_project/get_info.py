@@ -1,6 +1,10 @@
+from os import name
+from bs4.element import CharsetMetaAttributeValue
 import requests
 from bs4 import BeautifulSoup
 import urllib.request
+
+save_path = 'info/'
 
 headers = {
             'Connection': 'close',
@@ -20,14 +24,20 @@ def download_img(id,src):
         
 
 def main():
-
+    sheet = 0
+    with open(save_path+str(sheet)+'说唱.csv','a+') as f:
+        f.write('歌曲ID'+','+'歌单标题'+','+'创建者昵称'+','+'创建者id'+','+'介绍'+','+'歌曲数量'+','+'播放量'+','+'添加到播放列表次数'+','+'分享次数'+','+'评论数'+'\n')
     id_list = ['/playlist?id=6952442013', '/playlist?id=2695101341', '/playlist?id=6862602894', '/playlist?id=6700242542', '/playlist?id=6970792582', '/playlist?id=5395488578', '/playlist?id=6654532835', '/playlist?id=4952648595', '/playlist?id=2875321368', '/playlist?id=5269453086', '/playlist?id=2394125021', '/playlist?id=4959088044', '/playlist?id=4867926094', '/playlist?id=2049779104', '/playlist?id=537367797', '/playlist?id=2841424429', '/playlist?id=3215209929', '/playlist?id=2873336061', '/playlist?id=5203647472', '/playlist?id=2679916677', '/playlist?id=5295292555', '/playlist?id=2834027258', '/playlist?id=6611168504', '/playlist?id=6663187462', '/playlist?id=5013820355', '/playlist?id=6610703103', '/playlist?id=2621595367', '/playlist?id=3097267488', '/playlist?id=2644743965', '/playlist?id=2523624603', '/playlist?id=5363801096', '/playlist?id=2689902290', '/playlist?id=2688991686', '/playlist?id=5206470585', '/playlist?id=6708035697']
     path = 'https://music.163.com'
     for i in range(len(id_list)):
+        id = id_list[i][-10:]
         url = path+id_list[i]
         response = requests.session().get(url=url,headers=headers)
         html = response.content.decode('utf-8')
-        soup = BeautifulSoup(html, 'html.parser')、
+        soup = BeautifulSoup(html, 'html.parser')
+        #print(soup)
+
+        # 歌单的封面图片（需把图片保存到本地）、歌单标题、创建者id、创建者昵称、介绍、歌曲数量、播放量、添加到播放列表次数、分享次数、评论数。
 
         # 图片下载
         '''img_info = soup.find('div',class_='cover u-cover u-cover-dj')
@@ -37,10 +47,43 @@ def main():
         #download_img(img_id,img_url)
         print(img_url)'''
 
-        # 
+        # 歌单标题
+        title = soup.find('h2',class_ = 'f-ff2 f-brk').text
+        #print(title)
+
+        # 创建者昵称
+        create_name = soup.find('span',class_='name').text.strip('\n')
+        #print(create_name)
         
+        # 创建者id
+        create_id = soup.find('span',class_='name').select('a')[0]['href'][14:]
+        #print(create_id)
 
+        # 介绍
+        describe = soup.find('p',class_='intr f-brk').text.replace('\n','\t').replace(',','，')
+        #print(describe)
 
-        break
+        # 歌曲数量
+        song_num = soup.find('span','sub s-fc3').find('span').text
+        #print(song_num)
+
+        # 播放量
+        play_num = soup.find('strong','s-fc6').text
+        #print(play_num)
+
+        # 添加到播放列表次数
+        add_num = soup.find('a','u-btni u-btni-fav')['data-count']
+        #print(add_num)
+
+        # 分享次数
+        share_num = soup.find('a','u-btni u-btni-share')['data-count']
+        #print(share_num)
+
+        # 评论数
+        comment_num = soup.find('a','u-btni u-btni-cmmt').find('span').text
+        #print(comment_num)
+
+        with open(save_path+str(sheet)+'说唱.csv','a+') as f:
+            f.write(id+','+title+','+create_name+','+create_id+','+str(describe)+','+song_num+','+play_num+','+add_num+','+share_num+','+comment_num+'\n')
 
 main()
