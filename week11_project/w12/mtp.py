@@ -26,4 +26,5 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         except Exception as exc:
             print('%r generated an exception: %s' % (url, exc))
         else:
+            #print(data)
             print('%r page is %d KB' % (url, (len(data)//8)//1024))
