@@ -2,6 +2,10 @@ from multiprocessing import Process,Queue
 import time
 import jieba
 import jieba.analyse
+import pickle
+
+
+path = 'word_count/'
 
 # 作业要求
 
@@ -41,7 +45,10 @@ class Map(Process):
                         words_count[word] +=1
         map_end = time.time()
         print(f"the no.{self.num} process use {map_end-map_start}s")
-        self.q.put(words_count)
+
+        with open(path+str(self.num)+'_count.pkl','rb') as f:
+            pickle.dump(words_count,f)
+        #self.q.put(words_count)
         #return words_count
 
 
@@ -49,8 +56,9 @@ class Map(Process):
 
 class Reduce(Process):
 
-    def __init__(self):
+    def __init__(self,q):
         super().__init__()
+        self.q = q
 
     def run(self):
         return
@@ -98,11 +106,12 @@ if __name__ == '__main__':
         map_process.append(p)
     
     main_start = time.time()
+    print(map_process)
 
-    for p in map_process:
+    '''for p in map_process:
         p.start()
     for p in map_process:
-        p.join()
+        p.join()'''
 
     main_end = time.time()
     print(f"The whole process use {main_end-main_start}s")
