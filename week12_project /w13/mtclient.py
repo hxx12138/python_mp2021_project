@@ -39,10 +39,10 @@ class ChatBot(Thread):
 		_client.close()
 
 def main():
-	ip=sys.argv[1]
-	port=int(sys.argv[2])
+	ip='127.0.0.1'
+	port=30000
 	tlist=[]
-	for i in range(int(sys.argv[3])):
+	for i in range(int(8)):
 		tlist.append(ChatBot(ip,port,random.randint(4,8)))
 	for t in tlist:
 		t.start()

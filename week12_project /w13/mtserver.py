@@ -23,8 +23,8 @@ def speak(name,conn):
 	conn.close()
 
 if __name__=='__main__':
-	ip=sys.argv[1]
-	port=int(sys.argv[2])
+	ip='127.0.0.1'
+	port=30000
 	server=socket(AF_INET,SOCK_STREAM)
 	server.setsockopt(SOL_SOCKET,SO_REUSEADDR,1)#端口释放后马上可以被重新使用
 	server.bind((ip,port))
@@ -32,6 +32,7 @@ if __name__=='__main__':
 	print("MT server is started...")
 	while True:
 		conn,addr=server.accept()#block
+		#print(conn)
 		ci,cp=addr
 		#启动一个线程处理该连接，主线程继续处理其他连接
 		t=Thread(target=speak,args=("client-"+ci+"-"+str(cp),conn))
