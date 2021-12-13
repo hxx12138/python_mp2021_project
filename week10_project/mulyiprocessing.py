@@ -43,11 +43,15 @@ class Map(Process):
                         words_count[word] = 1
                     else:
                         words_count[word] +=1
-        map_end = time.time()
-        print(f"the no.{self.num} process use {map_end-map_start}s")
 
-        with open(path+str(self.num)+'_count.pkl','rb') as f:
+
+        with open(path+str(self.num)+'_count.pkl','wb') as f:
             pickle.dump(words_count,f)
+        self.q.put(path+str(self.num)+'_count.pkl')
+
+        map_end = time.time()
+        print(f"the no.{self.num} process use {map_end - map_start}s")
+
         #self.q.put(words_count)
         #return words_count
 
@@ -61,7 +65,17 @@ class Reduce(Process):
         self.q = q
 
     def run(self):
-        return
+        total_words_dict = {}
+        for i in range(len(self.q)):
+            with open(self.q[i]+'.pkl','rb') as f:
+                word_dict = pickle.load(f)
+            for word in word_dict:
+                if word not in total_words_dict:
+                    total_words_dict[word] = word_dict[word]
+                else:
+                    total_words_dict[word] += word_dict[word]
+        with open(path+'total.pkl','wb') as f:
+            pickle.dump(total_words_dict,f)
 
 
 # 3. 主进程可提前读入所有的文档的路径列表，供多个Map进程竞争获取文档路径；或由主进程根据Map进程的数目进行分发；或者单独实现一个分发进程，与多个MAP进程通信。 
@@ -87,8 +101,8 @@ if __name__ == '__main__':
     map_count = 8
     map_task=[[] for i in range(map_count)]
     for i in range(map_count-1):
-        start = int((i/8)*total_text)
-        end = int(((i+1)/8)*total_text)
+        start = int((i/map_count)*total_text)
+        end = int(((i+1)/map_count)*total_text)
         map_task[i].append(start)
         map_task[i].append(end)
     map_task[map_count-1].append(end)
@@ -106,12 +120,17 @@ if __name__ == '__main__':
         map_process.append(p)
     
     main_start = time.time()
-    print(map_process)
 
     '''for p in map_process:
         p.start()
     for p in map_process:
         p.join()'''
+
+    q = [path+'0_count',path+'1_count',path+'2_count',path+'3_count',path+'4_count',path+'5_count',path+'6_count',path+'7_count']
+
+    process = Reduce(q)
+    process.start()
+    process.join()
 
     main_end = time.time()
     print(f"The whole process use {main_end-main_start}s")
