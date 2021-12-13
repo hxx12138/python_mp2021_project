@@ -19,10 +19,16 @@ def fenci(p,q,stoplist,sentencelist):
     over=time.time()
     print(f"{p}个进程，the no.{q} process use {over-start}s")
 
-    
+def reduce(dic1,dic2):
+    for key,value in dic2.items():
+        if key in dic1:
+            dic1[key]+=value
+        else :
+            dic1[key]=value
+    return dic1
 
 if __name__=='__main__':
-    start=time.time()
+    '''start=time.time()
     f=open('news_sohusite_xml.dat',encoding='gb18030')
     contentlist=[]
     plist=[]
@@ -54,6 +60,17 @@ if __name__=='__main__':
     for p in plist:
         p.join()
     over6=time.time()
-    print('6个进程总时间：',over6-start)
-    
+    print('6个进程总时间：',over6-start)'''
+    totaldic={}
+    with open('process6-0.pkl','rb')as f:
+        totaldic=pickle.load(f)
+    for i in range(1,6):
+        with open('process6-'+str(i)+'.pkl','rb') as f:
+            dic1=pickle.load(f)
+            totaldic=reduce(totaldic,dic1)
+            f.close()
+    with open ('process6-total.pkl','wb') as f:
+        pickle.dump(totaldic,f)
+            
+        
     

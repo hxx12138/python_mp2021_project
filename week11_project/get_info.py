@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import urllib.request
 
 save_path = 'info/'
+img_path = 'cover/'
 
 headers = {
             'Connection': 'close',
@@ -16,8 +17,8 @@ headers = {
             "user-agent":'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.55 Safari/537.36'
            }
 
-def download_img(id,src):
-    with open(id+'.jpg','wb+') as f:
+def download_img(path,id,src):
+    with open(path+id+'.jpg','wb+') as f:
         response = urllib.request.urlopen(src)
         img = response.read()
         f.write(img)
@@ -40,12 +41,12 @@ def main():
         # 歌单的封面图片（需把图片保存到本地）、歌单标题、创建者id、创建者昵称、介绍、歌曲数量、播放量、添加到播放列表次数、分享次数、评论数。
 
         # 图片下载
-        '''img_info = soup.find('div',class_='cover u-cover u-cover-dj')
+        img_info = soup.find('div',class_='cover u-cover u-cover-dj')
         img_url = img_info.find('img',class_='j-img')['data-src']
         img_id = id_list[i][-10:]
 
-        #download_img(img_id,img_url)
-        print(img_url)'''
+        download_img(img_path,img_id,img_url)
+        #print(img_url)
 
         # 歌单标题
         title = soup.find('h2',class_ = 'f-ff2 f-brk').text
