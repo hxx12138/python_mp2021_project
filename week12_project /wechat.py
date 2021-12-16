@@ -51,11 +51,25 @@ class Manager(Thread):
 
 class Chatter(Thread):
 
-    def __init__(self):
+    def __init__(self,ip,port,mlength):
         super().__init__()
+        self._ip=ip
+		self._port=port
+		self._max_msg_length=mlength
 
     def run(self):
-        return
+        _client=socket(AF_INET,SOCK_STREAM)
+		_client.connect((self._ip,self._port))
+		_sent_count=0
+		while True:
+			msg=self._random_message()
+			_client.send(msg.encode('utf-8'))
+			_sent_count+=1
+			time.sleep(random.randint(1,5))
+			if _sent_count>ROUND:
+				_client.send('byebye'.encode('utf-8'))
+				break
+		_client.close()
 
 
-
+if __name__=='__main__':
