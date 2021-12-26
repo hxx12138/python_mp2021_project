@@ -65,7 +65,7 @@ else:
 # 聊天窗口
 root1 = tkinter.Tk()
 root1.geometry("640x480")
-root1.title('群聊')
+root1.title('群聊'+user)
 root1.resizable(0,0)
 
 # 消息界面
@@ -85,7 +85,11 @@ listbox1.place(x=510, y=0, width=130, height=320)
  
  
 def send(*args):
-    message = entryIuput.get() + '~' + user + '~' + chat
+    message = entryIuput.get() + '@' + user + '@' + chat
+    f = open('client'+user+'.txt','a')
+    f.write(message)
+    f.write('\n')
+    f.close
     s.send(message.encode())
     INPUT.set('')
     
@@ -109,7 +113,7 @@ def receive():
                 listbox1.insert(tkinter.END, uses[x])
             users.append('------Group chat-------')
         except:
-            data = data.split('~')
+            data = data.split('@')
             message = data[0]
             userName = data[1]
             chatwith = data[2]
