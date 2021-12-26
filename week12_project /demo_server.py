@@ -6,7 +6,8 @@ import os
 import os.path
 import sys
  
- 
+text = ''
+
 IP = '127.0.0.1'
 PORT = 9999 # 端口
 messages = queue.Queue()
@@ -48,6 +49,10 @@ class ChatServer(threading.Thread):
             while True:
                 message = conn.recv(1024) # 发送消息
                 message = message.decode()
+                f = open('server.txt','a')
+                f.write(message)
+                f.write('\n')
+                f.close
                 message = user + ':' + message
                 self.Load(message,addr)
             conn.close()
