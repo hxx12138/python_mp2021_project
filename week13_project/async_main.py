@@ -45,35 +45,46 @@ def download_img(path,title,src):
 
 # 编写爬虫函数
 async def get_id(url):
-    async with aiohttp.Clientsession(headers = headers_1) as session:
+    async with aiohttp.ClientSession(headers = headers_1, connector=aiohttp.TCPConnector(ssl=False)) as session:
         async with session.get(url) as response:
-            return response
+            return await response.text()
 
 # 协程爬取id
 async def run_get_id(pages):
     print(f'the no{currentThread().name} process_id has started')
     #for i in pages:
     for i in range(1):
-        time.sleep(1)
+        #time.sleep(1)
         path = 'https://music.163.com'
         url = 'https://music.163.com/discover/playlist/?order=hot&cat=说唱&limit=35&offset=' + str(i)
-        try:
-            '''while True:
+        #try:
+        '''while True:
                 #response = requests.session().get(url=url,headers=headers_1)
                 response = await get_id(url)
                 time.sleep(1)
                 if response != []:
                     break'''           
             #response = requests.session().get(url=url,headers=headers_1)
-            response = await get_id(url)
-            time.sleep(1)
-        except:
-            print('网络请求错误')
-        time.sleep(1)
-        html = response.content.decode('utf-8')
+            #response = await get_id(url)
+            #time.sleep(1)
+        #except:
+            #print('网络请求错误')
+        '''while True:
+                #response = requests.session().get(url=url,headers=headers_1)
+                response = await get_id(url)
+                time.sleep(1)
+                if response != []:
+                    break'''           
+            #response = requests.session().get(url=url,headers=headers_1)
+        #response = await get_id(url)
+        html = await get_id(url)
+            #time.sleep(1)
+        #time.sleep(1)
+        #html = await response.text()
+        #html = response.text()
 
         playlist_ids = []
-        playlist_ids.extend(re.findall(r'playlist\?id=(\d+?)" class="msk"',response.text))
+        playlist_ids.extend(re.findall(r'playlist\?id=(\d+?)" class="msk"',html))
         #print(playlist_ids)
 
         soup = BeautifulSoup(html, 'html.parser')
@@ -96,7 +107,10 @@ async def run_get_id(pages):
         q.put(id_list)
 
 # 爬取歌单信息
-async def get_info():
+async def get_info(url,headers):
+    async with aiohttp.ClientSession(headers = headers, connector=aiohttp.TCPConnector(ssl=False)) as session:
+        async with session.get(url) as response:
+            return await response.text()
 
 async def run_get_info():
     print(f'the no{currentThread().name} pconsumer has started')
@@ -113,19 +127,29 @@ async def run_get_info():
             try:
                 count = 1
                 while True:
-                    response = requests.session().get(url=url,headers=headers_1)
-                    html = response.content.decode('utf-8')
+                    start = time.time()
+                    '''response = requests.session().get(url=url,headers=headers_1)
+                    html = response.content.decode('utf-8')'''
+                    html = await get_info(url,headers_1)
                     soup = BeautifulSoup(html, 'html.parser')
                     time.sleep(count)
-                    if soup.find('p',class_='intr f-brk') != None:
+                    if soup.find('p',class_='intr f-brk') == None:
                         break
-                    response = requests.session().get(url=url,headers=headers_2)
-                    html = response.content.decode('utf-8')
+                    '''response = requests.session().get(url=url,headers=headers_2)
+                    html = response.content.decode('utf-8')'''
+                    html = await get_info(url,headers_2)
                     soup = BeautifulSoup(html, 'html.parser')
-                    time.sleep(count)
-                    if soup.find('p',class_='intr f-brk') != None:
+                    end = time.time()
+                    time.sleep(count)2
+                    if soup.find('p',class_='intr f-brk') == None:
                         break
                     count += 1
+                    if count > 1:
+                        print('无法请求到结果')
+                        break
+                    if end-start > 2:
+                        print('超时')
+                        break
             except:
                 print(soup.find('p',class_='intr f-brk'))
                 print('网络超时')
@@ -134,66 +158,94 @@ async def run_get_info():
             #print(soup)
 
             # 歌单的封面图片（需把图片保存到本地）、歌单标题、创建者id、创建者昵称、介绍、歌曲数量、播放量、添加到播放列表次数、分享次数、评论数。
+            try:
+                # 歌单标题
+                title = soup.find('h2',class_ = 'f-ff2 f-brk').text
+                #print(title)
 
-            # 歌单标题
-            title = soup.find('h2',class_ = 'f-ff2 f-brk').text
-            #print(title)
+                # 图片下载
+                #img_info = soup.find('div',class_='cover u-cover u-cover-dj')
+                #img_url = img_info.find('img',class_='j-img')['data-src']
+                #img_id = id_list[i][-10:]
 
-            # 图片下载
-            img_info = soup.find('div',class_='cover u-cover u-cover-dj')
-            img_url = img_info.find('img',class_='j-img')['data-src']
-            img_id = id_list[i][-10:]
+                #download_img(img_path,title,img_url)
+                #print(img_url)
 
-            download_img(img_path,title,img_url)
-            #print(img_url)
+                # 创建者昵称
+                create_name = soup.find('span',class_='name').text.strip('\n')
+                #print(create_name)
+                
+                # 创建者id
+                create_id = soup.find('span',class_='name').select('a')[0]['href'][14:]
+                #print(create_id)
 
-            # 创建者昵称
-            create_name = soup.find('span',class_='name').text.strip('\n')
-            #print(create_name)
+                # 介绍
+                describe = soup.find('p',class_='intr f-brk').text.replace('\n','\t').replace(',','，')
+                #print(describe)
+
+                # 歌曲数量
+                song_num = soup.find('span','sub s-fc3').find('span').text
+                #print(song_num)
+
+                # 播放量
+                play_num = soup.find('strong','s-fc6').text
+                #print(play_num)
+
+                # 添加到播放列表次数
+                add_num = soup.find('a','u-btni u-btni-fav')['data-count']
+                #print(add_num)
+
+                # 分享次数
+                share_num = soup.find('a','u-btni u-btni-share')['data-count']
+                #print(share_num)
+
+                # 评论数
+                comment_num = soup.find('a','u-btni u-btni-cmmt').find('span').text
+                #print(comment_num)
+
+                print('success')
+
+                text_q.put(id+','+title+','+create_name+','+create_id+','+str(describe)+','+song_num+','+play_num+','+add_num+','+share_num+','+comment_num+'\n')
             
-            # 创建者id
-            create_id = soup.find('span',class_='name').select('a')[0]['href'][14:]
-            #print(create_id)
-
-            # 介绍
-            describe = soup.find('p',class_='intr f-brk').text.replace('\n','\t').replace(',','，')
-            #print(describe)
-
-            # 歌曲数量
-            song_num = soup.find('span','sub s-fc3').find('span').text
-            #print(song_num)
-
-            # 播放量
-            play_num = soup.find('strong','s-fc6').text
-            #print(play_num)
-
-            # 添加到播放列表次数
-            add_num = soup.find('a','u-btni u-btni-fav')['data-count']
-            #print(add_num)
-
-            # 分享次数
-            share_num = soup.find('a','u-btni u-btni-share')['data-count']
-            #print(share_num)
-
-            # 评论数
-            comment_num = soup.find('a','u-btni u-btni-cmmt').find('span').text
-            #print(comment_num)
-
-            with open(save_path+'说唱.csv','a+') as f:
+            except:
+                print('failed')
+            '''with open(save_path+'说唱.csv','a+') as f:
                 f.write(id+','+title+','+create_name+','+create_id+','+str(describe)+','+song_num+','+play_num+','+add_num+','+share_num+','+comment_num+'\n')
+'''
+def write():
+    while True:
+        text = text_q.get()
+        if text == None:
+            break
+        with open(save_path+'说唱.csv','a+') as f:
+            f.write(text)
 
 
 
 if __name__ == '__main__':
 
     q = queue.Queue()
+    text_q = queue.Queue()
     producer_list = []
     consumer_list = []
     with open(save_path+'说唱.csv','a+') as f:
         f.write('歌曲ID'+','+'歌单标题'+','+'创建者昵称'+','+'创建者id'+','+'介绍'+','+'歌曲数量'+','+'播放量'+','+'添加到播放列表次数'+','+'分享次数'+','+'评论数'+'\n')
 
+    loop_id = asyncio.get_event_loop()
     sheet = list(range(0,1300,35))
-    asyncio.run(run_get_id(sheet))
+    tasks = [run_get_id(sheet[i]) for i in range(len(sheet))]    #len(sheet)
+    loop_id.run_until_complete(asyncio.wait(tasks))
+
+    loop_info = asyncio.get_event_loop()
+    thread_num = 38
+    tasks = [run_get_info() for i in range(thread_num)]    #
+    loop_info.run_until_complete(asyncio.wait(tasks))
+
+    write_t = Thread(target=write)
+    write_t.start()
+    write_t.join()
+    
+    #asyncio.run(run_get_id(sheet))
     '''p_t = Thread(target=run_get_id)
     p_t.start()
     p_t.join()
