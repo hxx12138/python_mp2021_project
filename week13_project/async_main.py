@@ -56,7 +56,7 @@ async def run_get_id(pages):
     for i in range(1):
         #time.sleep(1)
         path = 'https://music.163.com'
-        url = 'https://music.163.com/discover/playlist/?order=hot&cat=说唱&limit=35&offset=' + str(i)
+        url = 'https://music.163.com/discover/playlist/?order=hot&cat=说唱&limit=35&offset=' + str(pages)
         #try:
         '''while True:
                 #response = requests.session().get(url=url,headers=headers_1)
@@ -140,11 +140,11 @@ async def run_get_info():
                     html = await get_info(url,headers_2)
                     soup = BeautifulSoup(html, 'html.parser')
                     end = time.time()
-                    time.sleep(count)2
+                    time.sleep(count)
                     if soup.find('p',class_='intr f-brk') == None:
                         break
                     count += 1
-                    if count > 1:
+                    if count > 2:
                         print('无法请求到结果')
                         break
                     if end-start > 2:
@@ -205,8 +205,10 @@ async def run_get_info():
 
                 print('success')
 
-                text_q.put(id+','+title+','+create_name+','+create_id+','+str(describe)+','+song_num+','+play_num+','+add_num+','+share_num+','+comment_num+'\n')
-            
+                #text_q.put(id+','+title+','+create_name+','+create_id+','+str(describe)+','+song_num+','+play_num+','+add_num+','+share_num+','+comment_num+'\n')
+                text = id+','+title+','+create_name+','+create_id+','+str(describe)+','+song_num+','+play_num+','+add_num+','+share_num+','+comment_num+'\n'
+                with open(save_path+'说唱.csv','a+') as f:
+                    f.write(text)
             except:
                 print('failed')
             '''with open(save_path+'说唱.csv','a+') as f:
@@ -219,8 +221,6 @@ def write():
             break
         with open(save_path+'说唱.csv','a+') as f:
             f.write(text)
-
-
 
 if __name__ == '__main__':
 
@@ -241,9 +241,9 @@ if __name__ == '__main__':
     tasks = [run_get_info() for i in range(thread_num)]    #
     loop_info.run_until_complete(asyncio.wait(tasks))
 
-    write_t = Thread(target=write)
+    '''write_t = Thread(target=write)
     write_t.start()
-    write_t.join()
+    write_t.join()'''
     
     #asyncio.run(run_get_id(sheet))
     '''p_t = Thread(target=run_get_id)

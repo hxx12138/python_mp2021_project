@@ -29,7 +29,7 @@ TO_ADDR = '19377184@buaa.edu.cn'
 # 而不要跳到发送另一个http请求的函数中，因为由于b站的风控较为严格，短时间大量的请求可能会导致ip被封禁。
 
 class BiliHotCrawler():
-    def __init__(self,cate,limit=300):
+    def __init__(self,cate,limit=10000):
         self.cate_id = cate
         self.limit = limit
         self.page = 1
@@ -46,8 +46,8 @@ class BiliHotCrawler():
             'cate_id':self.cate_id,
             'page':self.page,
             'pagesize':self.pagesize,
-            'time_from':20211110,
-            'time_to':20211117
+            'time_from':20211117,
+            'time_to':20211124
         }
 
     async def get_resp(self):
@@ -63,8 +63,10 @@ class BiliHotCrawler():
         with open(path,"a") as f:
             self.resp = eval(self.resp.decode('utf-8').replace('null','None').replace('false',"False").replace("true","True").replace("\n"," "))
             for item in self.resp["result"]:
+                title = str(item["title"]).replace('\n','。').replace(',',' ')
+                description = str(item["description"]).replace('\n','。').replace(',',' ')
                 # 分类 排名 bv号 时长 播放量 弹幕 标题 封面 评论 收藏 描述 直链
-                f.write(f'{self.cate_id},{item["rank_offset"]},{item["bvid"]},{item["duration"]},{item["play"]},{item["video_review"]},{item["title"]},{item["pic"]},{item["review"]},{item["favorites"]},{item["description"]},{item["arcurl"]}'.replace("\n"," ").encode('utf-8', 'replace').decode('utf-8'))
+                f.write(f'{self.cate_id},{item["rank_offset"]},{item["bvid"]},{item["duration"]},{item["play"]},{item["video_review"]},{title},{item["pic"]},{item["review"]},{item["favorites"]},{description},{item["arcurl"]}'.replace("\n"," ").encode('utf-8', 'replace').decode('utf-8'))
                 f.write("\n")
 
     def log(self,isend=False):
