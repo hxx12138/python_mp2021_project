@@ -6,12 +6,14 @@ client = pymongo.MongoClient("mongodb+srv://hxx:hexihexiang2000@cluster0.amu8k.m
 
 db = client['info']
 collections = db['content']
-mydict = { "name": "Google", "alexa": "1", "url": "https://www.google.com" }
-x = collections.insert_one(mydict)
+#mydict = { "name": "Google", "alexa": "1", "url": "https://www.google.com" }
+#x = collections.insert_one(mydict)
 
-print(db)
+#print(db)
 db_list = client.list_database_names()
 print(db_list)
+x = collections.find_one()
+print(x)
 
 
 
