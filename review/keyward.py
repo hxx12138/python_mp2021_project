@@ -67,3 +67,10 @@ f = fab(5)
 while True: 
     print(f.__next__())'''
 
+'''list1=['A','B','C'] 
+list2=list1 
+list1.append('D') 
+print(list2)'''
+
+dt = {'k1': 1, 'k2': 2, 'k3': 3} 
+print('k1: {0[k1]}; k2: {0[k2]}; k3: {0[k3]}'.format(dt))

@@ -35,11 +35,11 @@ class Student:
 def main():
 	cc=Course('c',2,'z')
 	cp=Course('python',2,'z')
-	'''cc.print_course()
+	cc.print_course()
 	cp.print_course()
 
 	s=Student('l')
-	s.choose_course(cc)'''
+	s.choose_course(cc)
 
 	print(Course.ID)
 	Course.print_course(cc)
