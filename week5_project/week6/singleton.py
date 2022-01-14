@@ -11,7 +11,7 @@ class Singleton:
 			Singleton.__init__(Singleton._instance,name,volume)
 		return Singleton._instance
 
-slist=[Singleton('z',100) for i in range(10)]
+slist=[Singleton('z',i) for i in range(10)]
 for s in slist:
 	print(hex(id(s)),end='\t')
 	print(f"{s.name}\t{s.volume}")

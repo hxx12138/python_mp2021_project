@@ -3,6 +3,11 @@ import threading
 import random
 import time
 
+lock = threading.Lock()
+lock.acquire()
+print(1)
+lock.release()
+
 class Runner(Thread):
 	def __init__(self,name,timer,stime):
 		super().__init__()

@@ -9,10 +9,10 @@ def gtest():
 	x=yield 3
 
 g=gtest()
-#print(next(g))
-#print(next(g))
-#print(next(g))
+print(next(g))
+print(next(g))
+print(next(g))
 
-print(g.send(None))
-print(g.send('x=test'))
-print(g.send('y=test'))
+#print(g.send(None))
+#print(g.send('x=test'))
+#print(g.send('y=test'))
