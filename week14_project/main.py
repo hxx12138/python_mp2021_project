@@ -17,9 +17,9 @@ sleep_choice = [1,2,3,4,5]
 # Email Configer
 SMTP_SERVER = 'mail.buaa.edu.cn'
 PORT = 465
-FROM_ADDR = '19377184@buaa.edu.cn'
-PASSWD = 'hexihexiang2000'
-TO_ADDR = '19377184@buaa.edu.cn'
+FROM_ADDR = ''
+PASSWD = ''
+TO_ADDR = ''
 
 # 以Bilibili热榜为例，练习协程与非关系数据库的使用
 
